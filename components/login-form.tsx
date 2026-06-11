@@ -14,10 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 
-export function LoginForm({
+function LoginFormContent({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -28,6 +28,7 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +42,10 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // 登录成功后重定向到族谱关系图页面
-      router.push("/family-tree/graph");
+      // 登录成功后重定向到来源页面，默认族谱关系图
+      const redirectParam = searchParams.get("redirect");
+      const redirectTo = redirectParam ? decodeURIComponent(redirectParam) : "/family-tree/graph";
+      router.push(redirectTo);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -110,5 +113,35 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export function LoginForm(props: React.ComponentPropsWithoutRef<"div">) {
+  return (
+    <Suspense fallback={<div className="flex flex-col gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">登录</CardTitle>
+          <CardDescription>
+            请输入您的邮箱登录账户
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="email">邮箱</Label>
+              <Input id="email" type="email" placeholder="m@example.com" disabled />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">密码</Label>
+              <Input id="password" type="password" disabled />
+            </div>
+            <Button disabled>登录中...</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>}>
+      <LoginFormContent {...props} />
+    </Suspense>
   );
 }

@@ -38,18 +38,21 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
-  // 1. 先检查用户是否登录，未登录则重定向到登录页（放行 auth 页面）
+  // 未登录用户重定向到登录页（放行 auth 页面）
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
     const url = request.nextUrl.clone()
+    // 保存原始请求路径作为登录后的重定向目标
+    const redirectPath = encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)
     url.pathname = '/auth/login'
+    url.searchParams.set('redirect', redirectPath)
     return NextResponse.redirect(url)
   }
 
-  // 2. 已登录用户，首页重定向到族谱关系图
-  if (request.nextUrl.pathname === '/') {
+  // 已登录用户访问首页，重定向到族谱关系图
+  if (user && request.nextUrl.pathname === '/') {
     const url = request.nextUrl.clone()
     url.pathname = '/family-tree/graph'
     return NextResponse.redirect(url)
