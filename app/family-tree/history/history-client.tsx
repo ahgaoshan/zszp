@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,42 +11,13 @@ import { RichTextEditor } from "@/components/rich-text/editor";
 import { RichTextViewer } from "@/components/rich-text/viewer";
 import { saveFamilyHistory } from "./actions";
 
-interface FamilyHistoryRecord {
-  id: string;
-  title: string;
-  content: string | null;
-  updated_at: string;
-}
-
 export function HistoryClient() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("家族渊源");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
-
-  useEffect(() => {
-    // 简单的客户端数据获取，避免服务端预渲染问题
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/family-history");
-        if (response.ok) {
-          const data = await response.json();
-          setTitle(data.title || "家族渊源");
-          setContent(data.content || "");
-          setUpdatedAt(data.updated_at);
-        }
-      } catch (error) {
-        console.error("Failed to fetch history:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -60,24 +31,12 @@ export function HistoryClient() {
 
     if (result.success) {
       setIsEditing(false);
-      setUpdatedAt(new Date().toISOString());
+      setLastUpdated(new Date().toLocaleString("zh-CN"));
       router.refresh();
     } else {
       alert(`保存失败：${result.error}`);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <Card className="shadow-lg">
-          <CardContent className="flex items-center justify-center h-64">
-            <div className="text-muted-foreground">加载中...</div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -88,10 +47,10 @@ export function HistoryClient() {
               <ScrollText className="h-6 w-6 text-amber-700 dark:text-amber-400" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-serif">{title || "家族渊源"}</CardTitle>
-              {updatedAt && (
+              <CardTitle className="text-2xl font-serif">{title}</CardTitle>
+              {lastUpdated && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  最后更新：{new Date(updatedAt).toLocaleString("zh-CN")}
+                  最后更新：{lastUpdated}
                 </p>
               )}
             </div>
