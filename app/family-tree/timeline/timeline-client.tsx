@@ -20,12 +20,15 @@ import { Search, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TimelineNode, type TimelineNodeData } from "./timeline-node";
 import { YearNode, type YearNodeData } from "./year-node";
+import { parseYearFromCalendar } from "@/lib/utils";
 
 interface TimelineMember {
   id: number;
   name: string;
   birthday: string | null;
   death_date: string | null;
+  birthday_calendar: string | null;
+  death_date_calendar: string | null;
   generation: number | null;
 }
 
@@ -54,19 +57,28 @@ function TimelineFlow({ initialData }: TimelineClientProps) {
   React.useEffect(() => {
     if (!initialData.length) return;
 
-    // 1. Process dates and validity
+    // 1. Process dates and validity - supports both Gregorian and traditional calendar dates
     const members = initialData
-      .filter((m) => m.birthday)
       .map((m) => {
-        const startYear = new Date(m.birthday!).getFullYear();
-        let endYear = new Date().getFullYear();
-        const isAlive = !m.death_date && new Date().getFullYear() - startYear < 100;
+        // Try to extract year from both Gregorian and calendar/traditional dates
+        let startYear = parseYearFromCalendar(m.birthday);
+        let endYear: number;
 
-        if (m.death_date) {
-          endYear = new Date(m.death_date).getFullYear();
-        } else if (!isAlive) {
-            // Cap reasonable lifespan for visualization if death date missing but assumed dead
-            endYear = startYear + 80;
+        // If no birthday found, skip this member
+        if (!startYear) return null;
+
+        // Determine end year (death year or current year)
+        const deathYear = parseYearFromCalendar(m.death_date) || parseYearFromCalendar(m.death_date_calendar);
+        const currentYear = new Date().getFullYear();
+
+        if (deathYear) {
+          endYear = deathYear;
+        } else if (currentYear - startYear < 120) {
+          // Reasonable lifespan, assume alive
+          endYear = currentYear;
+        } else {
+          // Very old with no death date, cap at reasonable lifespan
+          endYear = startYear + 80;
         }
 
         if (endYear < startYear) endYear = startYear + 1;
@@ -75,9 +87,10 @@ function TimelineFlow({ initialData }: TimelineClientProps) {
           ...m,
           startYear,
           endYear,
-          isAlive,
+          isAlive: !deathYear && currentYear - startYear < 100,
         };
       })
+      .filter((m): m is NonNullable<typeof m> => m !== null)
       .sort((a, b) => a.startYear - b.startYear); // Sort by birth year
 
     if (members.length === 0) return;
