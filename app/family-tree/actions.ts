@@ -145,6 +145,13 @@ export async function deleteFamilyMembers(
 
   const supabase = await createClient();
 
+  // 先清空所有引用这些成员的 father_id（解除父子关系）
+  await supabase
+    .from("family_members")
+    .update({ father_id: null })
+    .in("father_id", ids);
+
+  // 再执行删除
   const { error } = await supabase
     .from("family_members")
     .delete()
