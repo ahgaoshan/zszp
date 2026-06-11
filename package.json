@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "A genealogy web application built with Next.js, Supabase, and Tailwind CSS.",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
