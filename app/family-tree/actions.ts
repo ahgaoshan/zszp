@@ -6,7 +6,6 @@ import { revalidatePath } from "next/cache";
 export interface FamilyMember {
   id: number;
   name: string;
-  given_name: string | null;
   courtesy_name: string | null;
   pseudonym: string | null;
   generation: number | null;
@@ -88,7 +87,6 @@ export async function fetchFamilyMembers(
 
 export interface CreateMemberInput {
   name: string;
-  given_name?: string | null;
   courtesy_name?: string | null;
   pseudonym?: string | null;
   generation?: number | null;
@@ -113,7 +111,6 @@ export async function createFamilyMember(
 
   const { error } = await supabase.from("family_members").insert({
     name: input.name,
-    given_name: input.given_name || null,
     courtesy_name: input.courtesy_name || null,
     pseudonym: input.pseudonym || null,
     generation: input.generation,
@@ -228,7 +225,6 @@ export async function updateFamilyMember(
     .from("family_members")
     .update({
       name: input.name,
-      given_name: input.given_name || null,
       courtesy_name: input.courtesy_name || null,
       pseudonym: input.pseudonym || null,
       generation: input.generation,
@@ -258,7 +254,6 @@ export async function updateFamilyMember(
 
 export interface ImportMemberInput {
   name: string;
-  given_name?: string | null;
   courtesy_name?: string | null;
   pseudonym?: string | null;
   generation?: number | null;
@@ -315,7 +310,6 @@ export async function batchCreateFamilyMembers(
 
     return {
       name: m.name,
-      given_name: m.given_name || null,
       courtesy_name: m.courtesy_name || null,
       pseudonym: m.pseudonym || null,
       generation: m.generation,

@@ -58,7 +58,6 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
     const ws = XLSX.utils.json_to_sheet([
       {
         姓名: `${FAMILY_SURNAME}某某`,
-        名: "宫福",
         字: "佐璜",
         号: "",
         世代: 20,
@@ -105,7 +104,6 @@ export function ImportMembersDialog({ onSuccess }: ImportMembersDialogProps) {
         const formattedData: ImportMemberInput[] = (data as Record<string, string | number>[]).map((row) => {
           return {
             name: String(row["姓名"] || ""),
-            given_name: row["名"] ? String(row["名"]) : null,
             courtesy_name: row["字"] ? String(row["字"]) : null,
             pseudonym: row["号"] ? String(row["号"]) : null,
             generation: row["世代"] ? Number(row["世代"]) : null,

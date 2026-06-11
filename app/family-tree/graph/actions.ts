@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 export interface FamilyMemberNode {
   id: number;
   name: string;
-  given_name: string | null;
   courtesy_name: string | null;
   pseudonym: string | null;
   generation: number | null;
@@ -33,7 +32,7 @@ export async function fetchAllFamilyMembers(): Promise<FetchGraphResult> {
 
   const { data, error } = await supabase
     .from("family_members")
-    .select("id, name, given_name, courtesy_name, pseudonym, generation, sibling_order, father_id, gender, official_position, is_alive, spouse, remarks, birthday, death_date, birthday_calendar, death_date_calendar, residence_place")
+    .select("id, name, courtesy_name, pseudonym, generation, sibling_order, father_id, gender, official_position, is_alive, spouse, remarks, birthday, death_date, birthday_calendar, death_date_calendar, residence_place")
     .order("generation", { ascending: true })
     .order("sibling_order", { ascending: true });
 

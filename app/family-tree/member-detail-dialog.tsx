@@ -50,12 +50,9 @@ export function MemberDetailDialog({
     return gregorianFormatted || "未记录";
   };
 
-  // 构建名/字/号显示文本
+  // 构建字/号显示文本
   const getNameDetail = () => {
     const parts: string[] = [];
-    if (member.given_name && member.given_name !== member.name) {
-      parts.push(`名${member.given_name}`);
-    }
     if (member.courtesy_name) {
       parts.push(`字${member.courtesy_name}`);
     }

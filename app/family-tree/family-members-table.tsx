@@ -80,7 +80,6 @@ export function FamilyMembersTable({
   // 新增表单状态
   const [formData, setFormData] = React.useState({
     name: "",
-    given_name: "",
     courtesy_name: "",
     pseudonym: "",
     generation: "",
@@ -177,7 +176,6 @@ export function FamilyMembersTable({
   const resetForm = () => {
     setFormData({
       name: "",
-      given_name: "",
       courtesy_name: "",
       pseudonym: "",
       generation: "",
@@ -208,7 +206,6 @@ export function FamilyMembersTable({
     setEditingMember(member);
     setFormData({
       name: member.name,
-      given_name: member.given_name ?? "",
       courtesy_name: member.courtesy_name ?? "",
       pseudonym: member.pseudonym ?? "",
       generation: member.generation?.toString() ?? "",
@@ -246,7 +243,6 @@ export function FamilyMembersTable({
 
     const memberData = {
       name: formData.name.trim(),
-      given_name: formData.given_name || null,
       courtesy_name: formData.courtesy_name || null,
       pseudonym: formData.pseudonym || null,
       generation: formData.generation ? parseInt(formData.generation) : null,
@@ -355,22 +351,7 @@ export function FamilyMembersTable({
                   />
                 </div>
 
-                {/* 名/字/号 */}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="given_name" className="text-right">
-                    名
-                  </Label>
-                  <Input
-                    id="given_name"
-                    value={formData.given_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, given_name: e.target.value })
-                    }
-                    className="col-span-3"
-                    placeholder="大名"
-                  />
-                </div>
-
+                {/* 字/号 */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="courtesy_name" className="text-right">
                     字

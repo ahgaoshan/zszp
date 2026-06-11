@@ -104,12 +104,9 @@ function FamilyMemberNodeComponent({ data }: FamilyNodeProps) {
           {nodeData.name}
         </div>
 
-        {/* 名/字/号 详情 */}
+        {/* 字/号 详情 */}
         {(() => {
           const parts: string[] = [];
-          if (nodeData.given_name && nodeData.given_name !== nodeData.name) {
-            parts.push(`名${nodeData.given_name}`);
-          }
           if (nodeData.courtesy_name) {
             parts.push(`字${nodeData.courtesy_name}`);
           }
