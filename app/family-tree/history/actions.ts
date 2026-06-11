@@ -39,7 +39,7 @@ export async function saveFamilyHistory(
     .from("family_history")
     .select("id")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   let error;
   if (existing) {

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollText, Save, Pencil, Loader2 } from "lucide-react";
+import { ScrollText, Save, Pencil, Loader2, Check } from "lucide-react";
 import { RichTextEditor } from "@/components/rich-text/editor";
 import { RichTextViewer } from "@/components/rich-text/viewer";
-import { saveFamilyHistory } from "./actions";
+import { saveFamilyHistory, fetchFamilyHistory } from "./actions";
 
 export function HistoryClient() {
   const router = useRouter();
@@ -17,7 +17,21 @@ export function HistoryClient() {
   const [title, setTitle] = useState("家族渊源");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  // 加载现有数据
+  useEffect(() => {
+    const loadData = async () => {
+      const record = await fetchFamilyHistory();
+      if (record) {
+        setTitle(record.title);
+        setContent(record.content || "");
+        setLastUpdated(new Date(record.updated_at).toLocaleString("zh-CN"));
+      }
+    };
+    loadData();
+  }, []);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -31,7 +45,10 @@ export function HistoryClient() {
 
     if (result.success) {
       setIsEditing(false);
+      setIsSaved(true);
       setLastUpdated(new Date().toLocaleString("zh-CN"));
+      // 2秒后清除成功提示
+      setTimeout(() => setIsSaved(false), 2000);
       router.refresh();
     } else {
       alert(`保存失败：${result.error}`);
@@ -62,9 +79,14 @@ export function HistoryClient() {
                   取消
                 </Button>
                 <Button onClick={handleSave} disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Save className="mr-2 h-4 w-4" />
-                  保存
+                  {isSaving ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : isSaved ? (
+                    <Check className="mr-2 h-4 w-4 text-green-500" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  {isSaving ? "保存中..." : isSaved ? "已保存" : "保存"}
                 </Button>
               </>
             ) : (
