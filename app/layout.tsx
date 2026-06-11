@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import { Analytics } from "@vercel/analytics/next";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { FAMILY_SURNAME } from "@/lib/utils";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const defaultUrl = process.env.DEPLOY_URL || process.env.URL || process.env.VERCEL_URL
+  ? `https://${process.env.DEPLOY_URL || process.env.URL || process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata: Metadata = {
@@ -32,7 +31,6 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   );
